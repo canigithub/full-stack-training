@@ -21,4 +21,6 @@ operation_mekong = media.Movie("Operation Mekong",
 
 movies = [zootopia, jason_bourne, operation_mekong]
 
+# calls open_movies_page function inside fresh_tomatoes
+# to generate the movie trailers html file.
 ft.open_movies_page(movies)
