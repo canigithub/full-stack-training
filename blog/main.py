@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2007 Google Inc.
+# Copyright 2016 Nengyun Zhang
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import jinja2
 
 from google.appengine.ext import db
 
-EMPTY_EMAIL = 'Empty Email'
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
@@ -44,25 +43,33 @@ def render_str(template, **params):
    t = jinja_env.get_template(template)
    return t.render(params)
 
-def make_secure_val(val):
+def make_secure_cookie(val):
    """
    given a string, return the hash_str of secret+string
    """
    return '%s|%s' % (val, hmac.new(secret, val).hexdigest())
 
-def check_secure_val(secure_val):
+def check_secure_cookie(secure_val):
    """
    check if the secure_val is valid via comparing the hash
    string to correct hash string
    """
    val = secure_val.split('|')[0]
-   if secure_val == make_secure_val(val):
+   if secure_val == make_secure_cookie(val):
       return val
 
 class BaseHandler(webapp2.RequestHandler):
    """
    The base handler that will be extended by other handlers
    """
+   def __init__(self, req, res):
+      """
+      check for if there exists user cookie
+      """
+      self.initialize(req, res)
+      uid = self.read_secure_cookie('user_id')
+      self.user = uid and User.by_id(int(uid))
+
    def write(self, text):
       """
       Write the response back to browser
@@ -84,7 +91,7 @@ class BaseHandler(webapp2.RequestHandler):
       set a cookie whose name is name and value is val.
       Expiration is not set
       """
-      cookie_val = make_secure_val(val)
+      cookie_val = make_secure_cookie(val)
       self.response.headers.add_header(
          'Set-Cookie',
          '%s=%s; Path=/' % (name, cookie_val))
@@ -96,16 +103,13 @@ class BaseHandler(webapp2.RequestHandler):
       cookie_val = self.request.cookies.get(name)
       # <=> if cookie_val and check_secure_val(cookie_val):
       #        return cookie_val
-      return cookie_val and check_secure_val(cookie_val)
+      return cookie_val and check_secure_cookie(cookie_val)
 
-   def initialize(self, *a, **kw):
-      """
-      check for the user cookie
-      """
-      # check to see if user is login or not
-      webapp2.RequestHandler.initialize(self, *a, **kw)
-      uid = self.read_secure_cookie('user_id')
-      self.user = uid and User.by_id(int(uid))
+   def login(self, user):
+      self.set_secure_cookie('user_id', str(user.key().id()))
+
+   def logout(self):
+      self.response.headers.add_header('Set-Cookie', 'user_id=; Path=/')
 
 
 class MainPageHandler(BaseHandler):
@@ -213,6 +217,13 @@ def make_pw_hash(name, pw, salt=None):
    h = hash_str(name + pw + salt)
    return '%s,%s' % (salt, h)
 
+def valid_pw(name, pw, h):
+   """
+   check if password is valid
+   """
+   salt = h.split(',')[0]
+   return h == make_pw_hash(name, pw, salt)
+
 
 def user_key(group='default'):
    """
@@ -245,13 +256,13 @@ class User(db.Model):
                   pw_hash=pw_hash,
                   email=email)
 
+   @classmethod
+   def login(cls, name, pw):
+      u = cls.by_name(name)
+      if u and valid_pw(name, pw, u.pw_hash):
+         return u
 
-def valid_pw(name, password, h):
-   """
-   check if password is valid
-   """
-   salt = h.split(',')[0]
-   return h == make_pw_hash(name, pw, salt)
+
 
 USER_RE = re.compile(r'^[\w-]{3,20}$')
 def valid_username(username):
@@ -318,13 +329,38 @@ class WelcomePageHandler(BaseHandler):
    handle '/blog/welcome'
    """
    def get(self):
-      user_id = self.request.cookies.get('user_id').split('|')[0]
+      user_id_cookie = self.request.cookies.get('user_id')
 
-      if not user_id:
+      if not user_id_cookie:
          self.write('Welcome visitor!')
+      else:
+         user_id = user_id_cookie.split('|')[0]
+         u = User.get_by_id(int(user_id), parent=user_key())
+         self.write('Welcome! %s' % u.name)
 
-      u = User.get_by_id(int(user_id), parent=user_key())
-      self.write('Welcome! %s' % u.name)
+
+class LoginPageHandler(BaseHandler):
+   def get(self):
+      self.render('login-form.html')
+
+   def post(self):
+      username = self.request.get('username')
+      password = self.request.get('password')
+
+      u = User.login(username, password)
+
+      if u:
+         self.login(u)
+         self.redirect('/welcome')
+      else:
+         self.render('login-form.html', error_msg='Invalid login')
+
+
+class LogoutHandler(BaseHandler):
+   def get(self):
+      self.logout()  # clear cookie
+      self.redirect('/signup')
+
 
 ###### Register routing ######
 
@@ -334,5 +370,7 @@ app = webapp2.WSGIApplication([
       ('/blog/newpost', NewPostHandler),
       ('/blog/(\d+)', PostPageHandler),
       ('/signup', SignupPageHandler),
+      ('/login', LoginPageHandler),
+      ('/logout', LogoutHandler),
       ('/welcome', WelcomePageHandler)
 ], debug=True)
