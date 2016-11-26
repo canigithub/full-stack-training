@@ -2,11 +2,17 @@
 <html>
 <head>
    <title>My Blog</title>
-   {% block head %}
-   {% endblock %}
+   <link rel="stylesheet" type="text/css" href="/static/main.css">
 </head>
 <body>
-   {% block body %}
-   {% endblock %}
+   <a href="/blog" class="main-title">
+      My Blog
+   </a>
+
+   <div id="content">
+      {% block body %}
+      {% endblock %}
+   </div>
+
 </body>
 </html>

@@ -1,28 +1,22 @@
 {% extends "base.html" %}
 
-{% block head %}
-<style type="text/css">
-   label {
-      display: block;
-   }
-
-   .error {
-      color: red;
-   }
-</style>
-{% endblock %}
-
 {% block body %}
+
+<h2>New Post</h2>
+
 <form method="post">
-   <label>Subject
+   <label>
+      <div>Subject</div>
       <input type="text" name="subject" value="{{subject}}">
    </label>
 
-   <label>Content
+   <label>
+      <div>Blog</div>
       <textarea name="content">{{content}}</textarea>
    </label>
 
    <div class="error">{{error_msg}}</div>
-   <button>Submit</button>
+
+   <input type="submit">
 </form>
 {% endblock %}
