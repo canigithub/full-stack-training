@@ -84,13 +84,12 @@ class EditPostPageHandler(base.BaseHandler):
       if not self.user:
          self.redirect('/login')
 
-      key = db.Key.from_path('Post', int(post_id), parent=blog.blog_key())
-      post = db.get(key)
+      post = blog.Post.by_id(int(post_id))
 
       if not post:
          self.error(404)
       elif post.user_id != str(self.user.key().id()):
-         self.redirect('/invalid')
+         self.redirect('/invalid/1')
       else:
          self.render('edit-post.html', p=post)
 
@@ -152,7 +151,7 @@ class PostLikeHandler(base.BaseHandler):
          self.redirect('/invalid/4')
       else:
          lk = True if up == 'like' else False
-         like.Like.add_like(post_id, user_id, lk)
+         like.Like.add_like(post_id, str(self.user.key().id()), lk)
          self.redirect('/blog')
 
 

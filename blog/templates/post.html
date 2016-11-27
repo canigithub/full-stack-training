@@ -14,8 +14,8 @@
    </div>
    <div class="post-footer">
       <h4>author: {{p.username | safe}}, post_id: {{p.key().id() | safe }}</h4>
-      <a href="/blog/edit/{{post_id}}">edit</a>
-      <a href="/blog/delete/{{post_id}}">delete</a>
+      <a href="/blog/edit/{{p.key().id()}}">edit</a>
+      <a href="/blog/delete/{{p.key().id()}}">delete</a>
       <div>
          <a href="/blog/like/{{p.key().id()}}/{{p.user_id}}">like</a>
          ({{likes}}) |
