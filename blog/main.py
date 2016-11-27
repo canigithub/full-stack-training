@@ -24,11 +24,13 @@ app = webapp2.WSGIApplication([
    ('/blog/newpost', blog.AddNewPostPageHandler),
    ('/blog/(\d+)', blog.PermalinkPageHandler),
    ('/blog/edit/(\d+)', blog.EditPostPageHandler),
+   ('/blog/delete/(\d+)', blog.DeletePostHandler),
+   ('/blog/(like|dislike)/(\d+)/(\d+)', blog.PostLikeHandler),
    ('/signup', user.SignupPageHandler),
    ('/login', user.LoginPageHandler),
    ('/logout', user.LogoutHandler),
    ('/welcome', other.WelcomePageHandler),
-   ('/invalid', other.InvalidPageHandler)
+   ('/invalid/(\d+)', other.InvalidPageHandler)
    ], debug=True)
 
 

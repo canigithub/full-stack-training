@@ -69,7 +69,7 @@ class User(db.Model):
       """
       get object using id
       """
-      return User.get_by_id(uid, parent=user_key())
+      return cls.get_by_id(uid, parent=user_key())
 
 
    @classmethod
@@ -77,7 +77,7 @@ class User(db.Model):
       """
       get object using 'name' field
       """
-      return User.all().filter("name = ", name).get()
+      return cls.all().filter("name = ", name).get()
 
 
    @classmethod
@@ -86,7 +86,7 @@ class User(db.Model):
       create a new User object
       """
       pw_hash = make_passwd_hash(name, passwd)
-      return User(parent=user_key(),
+      return cls(parent=user_key(),
                   name=name,
                   pw_hash=pw_hash,
                   email=email)

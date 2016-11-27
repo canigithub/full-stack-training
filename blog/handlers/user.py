@@ -120,7 +120,7 @@ class LogoutHandler(base.BaseHandler):
    """
    def get(self):
       self.logout()
-      self.redirect('/signup')
+      self.redirect('/login')
 
 
 

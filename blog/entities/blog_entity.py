@@ -2,6 +2,7 @@
 from google.appengine.ext import db
 
 import env
+import like_entity as like
 
 
 ##### Global Functions
@@ -42,11 +43,26 @@ class Post(db.Model):
    username = db.StringProperty(required=True)
 
 
-
-
    def render(self):
       """
+      take current user_id of the
       return the html text of the post
       """
       self.html_content = self.content.replace('/n', '<br>')
-      return render_str('post.html', p=self, post_id=str(self.key().id()))
+      likes = like.Like.get_likes(str(self.key().id()))
+      dislikes = like.Like.get_likes(str(self.key().id()), False)
+      return render_str('post.html', p=self, likes=likes,
+         dislikes=dislikes)
+
+   @classmethod
+   def by_id(cls, post_id):
+      return cls.get_by_id(post_id, parent=blog_key())
+
+
+
+
+
+
+
+
+

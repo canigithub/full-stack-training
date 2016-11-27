@@ -14,11 +14,11 @@ class WelcomePageHandler(base.BaseHandler):
 
 class InvalidPageHandler(base.BaseHandler):
    """
-   handles '/invalid'
+   handles '/invalid/(\d+)'
    display welcome page after user login.
    """
-   def get(self):
+   def get(self, code):
       if self.user:
-         self.render('invalid.html', username=self.user.name)
+         self.render('invalid.html', username=self.user.name, code=code)
       else:
          self.redirect('/blog')
