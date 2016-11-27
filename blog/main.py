@@ -16,20 +16,19 @@
 
 import webapp2
 
-from handlers import mainpage
-from handlers import blog
-from handlers import user
-from handlers import other
+from handlers import mainpage, blog, user, other
 
 app = webapp2.WSGIApplication([
    ('/', mainpage.MainPageHandler),
    ('/blog', blog.BlogFrontPageHandler),
    ('/blog/newpost', blog.AddNewPostPageHandler),
    ('/blog/(\d+)', blog.PermalinkPageHandler),
+   ('/blog/edit/(\d+)', blog.EditPostPageHandler),
    ('/signup', user.SignupPageHandler),
    ('/login', user.LoginPageHandler),
    ('/logout', user.LogoutHandler),
-   ('/welcome', other.WelcomePageHandler)
+   ('/welcome', other.WelcomePageHandler),
+   ('/invalid', other.InvalidPageHandler)
    ], debug=True)
 
 

@@ -1,9 +1,9 @@
-import base
-from entities import user as User
+import re
 
 from google.appengine.ext import db
 
-import re
+import base
+from entities import user_entity as user
 
 
 ##### Global Functions
@@ -71,13 +71,13 @@ class SignupPageHandler(base.BaseHandler):
       if is_error:
          self.render('signup-form.html', **params)
       else:
-         u = User.User.by_name(username)
+         u = user.User.by_name(username)
 
          if u:
             self.render('signup-form.html',
                         error_username='Username already exists')
          else:
-            u = User.User.create(username, password, email)
+            u = user.User.create(username, password, email)
             u.put()        # store user in database
             self.login(u)  # set cookie for current user
             self.redirect('/welcome')
@@ -100,7 +100,7 @@ class LoginPageHandler(base.BaseHandler):
 
       if username and password:
 
-         u = User.User.login(username, password)
+         u = user.User.login(username, password)
 
          if u:
             self.login(u)  # set cookie for current user

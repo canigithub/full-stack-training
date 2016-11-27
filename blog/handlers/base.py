@@ -1,16 +1,11 @@
 
-import os
 import hmac
 
 import webapp2
-import jinja2
 
-from entities import blog, user
-
-template_dir = os.path.join(os.path.dirname(__file__), os.pardir, 'templates')
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
-                                autoescape=True)
-
+from entities import blog_entity as blog
+from entities import user_entity as user
+import env
 
 secret = 'Holy shIt'
 
@@ -21,7 +16,7 @@ def render_str(template, **params):
    """
    return rendered text from the template and parameters
    """
-   t = jinja_env.get_template(template)
+   t = env.jinja_env.get_template(template)
    return t.render(params)
 
 

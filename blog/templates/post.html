@@ -12,4 +12,10 @@
    <div class="post-content">
       {{p.html_content | safe}}
    </div>
+   <div class="post-footer">
+      <h4>author: {{p.username | safe}}, post_id: {{p.key().id() | safe }}</h4>
+      <a href="/blog/edit/{{post_id}}">edit</a>
+   </div>
+
+
 </div>

@@ -1,14 +1,7 @@
 
 from google.appengine.ext import db
 
-import os
-import webapp2
-import jinja2
-
-template_dir = os.path.join(os.path.dirname(__file__), os.pardir, 'templates')
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
-                                autoescape=True)
-
+import env
 
 
 ##### Global Functions
@@ -17,7 +10,7 @@ def render_str(template, **params):
    """
    return rendered text from the template and parameters
    """
-   t = jinja_env.get_template(template)
+   t = env.jinja_env.get_template(template)
    return t.render(params)
 
 
@@ -39,11 +32,16 @@ class Post(db.Model):
       content - content of the post
       created - post created time
       last_modified - last modify time
+      user_id - the id of owner of this post
    """
    subject = db.StringProperty(required=True)
    content = db.TextProperty(required=True)
    created = db.DateTimeProperty(auto_now_add=True)
    last_modified = db.DateTimeProperty(auto_now=True)
+   user_id = db.StringProperty(required=True)
+   username = db.StringProperty(required=True)
+
+
 
 
    def render(self):
@@ -51,4 +49,4 @@ class Post(db.Model):
       return the html text of the post
       """
       self.html_content = self.content.replace('/n', '<br>')
-      return render_str('post.html', p=self)
+      return render_str('post.html', p=self, post_id=str(self.key().id()))

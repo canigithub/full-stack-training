@@ -1,8 +1,7 @@
-import base
-
 from google.appengine.ext import db
-from entities import blog as Blog
 
+import base
+from entities import blog_entity as blog
 
 ##### Blog Handlers
 
@@ -44,7 +43,11 @@ class AddNewPostPageHandler(base.BaseHandler):
       content = self.request.get('content')
 
       if subject and content:
-         p = Blog.Post(parent=Blog.blog_key(), subject=subject, content=content)
+         p = blog.Post(parent=blog.blog_key(),
+                  subject=subject,
+                  content=content,
+                  user_id=str(self.user.key().id()),
+                  username=self.user.name)
          p.put()
          self.redirect('/blog/%s' % str(p.key().id()))
       else:
@@ -61,7 +64,7 @@ class PermalinkPageHandler(base.BaseHandler):
    display the newly created post.
    """
    def get(self, post_id):
-      key = db.Key.from_path('Post', int(post_id), parent=Blog.blog_key())
+      key = db.Key.from_path('Post', int(post_id), parent=blog.blog_key())
       post = db.get(key)
 
       if not post:
@@ -71,6 +74,42 @@ class PermalinkPageHandler(base.BaseHandler):
 
 
 
+class EditPostPageHandler(base.BaseHandler):
+   """
+   handles '/blog/edit/(\d+)' where the number is the post id
+   display the to be edited post
+   """
+   def get(self, post_id):
+      if not self.user:
+         self.redirect('/login')
+
+      key = db.Key.from_path('Post', int(post_id), parent=blog.blog_key())
+      post = db.get(key)
+
+      if not post:
+         self.error(404)
+      elif post.user_id != str(self.user.key().id()):
+         self.redirect('/invalid')
+      else:
+         self.render('edit-post.html', p=post)
+
+
+   def post(self, post_id):
+      subject = self.request.get('subject')
+      content = self.request.get('content')
+
+      if subject and content:
+         key = db.Key.from_path('Post', int(post_id), parent=blog.blog_key())
+         p = db.get(key)
+         p.subject = subject
+         p.content = content
+         p.put()
+         self.redirect('/blog/%s' % str(p.key().id()))
+      else:
+         self.render('newpost.html',
+                     subject=subject,
+                     content=content,
+                     error_msg='Enter both subject and content, please!')
 
 
 

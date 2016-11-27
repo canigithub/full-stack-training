@@ -1,9 +1,8 @@
-
-from google.appengine.ext import db
-
 import hashlib
 import random
 from string import letters
+
+from google.appengine.ext import db
 
 
 ##### Global Functions
@@ -58,6 +57,7 @@ class User(db.Model):
       name - username
       pw_hash - hased password
       email - email
+      posts - posts posted by this user. format is pipe separated strings
    """
    name = db.StringProperty(required=True)
    pw_hash = db.StringProperty(required=True)
@@ -102,4 +102,5 @@ class User(db.Model):
 
       if u and valid_pw(name, passwd, u.pw_hash):
          return u
+
 
