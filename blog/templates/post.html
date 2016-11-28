@@ -4,14 +4,15 @@
       <div class="post-title">
          {{p.subject}}
       </div>
+      <div class="post-author">
+         author: {{p.username | safe}}
+      </div>
       <div class="post-date">
          {{p.created.strftime("%b %d, %Y")}}
       </div>
    </div>
 
-   <div class="post-author">
-      author: {{p.username | safe}}
-   </div>
+
 
    <div class="post-content">
       {{p.html_content | safe}}

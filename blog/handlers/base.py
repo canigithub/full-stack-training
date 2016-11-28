@@ -63,6 +63,7 @@ class BaseHandler(webapp2.RequestHandler):
       """
       render the view to browser
       """
+      params['welcome_name'] = 'visitor' if not self.user else self.user.name
       self.write(render_str(template, **params))
 
 

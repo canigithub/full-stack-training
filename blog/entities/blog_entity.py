@@ -58,6 +58,13 @@ class Post(db.Model):
    def by_id(cls, post_id):
       return cls.get_by_id(post_id, parent=blog_key())
 
+   @classmethod
+   def by_user_id(cls, user_id):
+      # print("^^^&&&***", cls.all().filter('user_id =', user_id).count())
+      # print("^^^&&&***", cls.all().filter('user_id =', user_id).get())
+      return cls.all().filter('user_id =', user_id).fetch(limit=20)
+
+
 
 
 

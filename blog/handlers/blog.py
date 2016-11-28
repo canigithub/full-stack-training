@@ -12,7 +12,8 @@ class BlogFrontPageHandler(base.BaseHandler):
    display the main page of blog section.
    """
    def get(self):
-      posts = db.GqlQuery('select * from Post order by created desc limit 10')
+      # posts = db.GqlQuery('select * from Post order by created desc limit 10')
+      posts = blog.Post.all().fetch(limit=20)
       self.render('blog-front.html', posts=posts)
 
 
@@ -81,8 +82,10 @@ class EditPostPageHandler(base.BaseHandler):
    display the to be edited post
    """
    def get(self, post_id):
+      print("^^^>>>", self.user)
       if not self.user:
          self.redirect('/login')
+         return
 
       post = blog.Post.by_id(int(post_id))
 
@@ -121,6 +124,7 @@ class DeletePostHandler(base.BaseHandler):
    def get(self, post_id):
       if not self.user:
          self.redirect('/login')
+         return
 
       key = db.Key.from_path('Post', int(post_id), parent=blog.blog_key())
       post = db.get(key)
@@ -128,7 +132,7 @@ class DeletePostHandler(base.BaseHandler):
       if not post:
          self.error(404)
       elif post.user_id != str(self.user.key().id()):
-         self.redirect('/invalid')
+         self.redirect('/invalid/1')
       else:
          post.delete()
          self.redirect('/blog')
@@ -143,6 +147,7 @@ class PostLikeHandler(base.BaseHandler):
    def get(self, up, post_id, user_id):
       if not self.user:
          self.redirect('/login')
+         return
 
       if user_id == str(self.user.key().id()):
          self.redirect('/invalid/2')
@@ -153,6 +158,29 @@ class PostLikeHandler(base.BaseHandler):
          lk = True if up == 'like' else False
          like.Like.add_like(post_id, str(self.user.key().id()), lk)
          self.redirect('/blog')
+
+
+
+class MyBlogPageHandler(base.BaseHandler):
+   """
+   handles '/blog/myblot'
+   display all posts that is posted by me
+   """
+   def get(self):
+      if not self.user:
+         self.redirect('/login')
+         return
+
+      posts = blog.Post.by_user_id(str(self.user.key().id()))
+      self.render('myblog.html', posts=posts)
+
+
+
+
+
+
+
+
 
 
 

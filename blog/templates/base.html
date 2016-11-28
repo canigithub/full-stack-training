@@ -13,14 +13,40 @@
 </head>
 
 <body>
-   <a href="/blog" class="main-title">
-      Homebrew Blog
-   </a>
 
-   <div id="content">
-      {% block body %}
-      {% endblock %}
+   <div class="base-topbar">
+      <p><b>Welcome, {{welcome_name}}!</b></p>
    </div>
+
+   <div class="base-navbar">
+      <div class="base-brand">
+            <a href="/"><h2>Homebrew Blog</h2></a>
+      </div>
+
+      <ul id='base-nav' class='nav nav-pills nav-stacked'>
+         <li><a href="/" class="active">Home</a></li>
+         <li><a href="/blog" class="">Blog</a></li>
+         <li><a href="/blog/myblog" class="">My Blogs</a></li>
+         <li><a href="/blog/newpost" class="">New Post</a></li>
+         <li><a href="/signup" class="">Sign Up</a></li>
+         <li><a href="/login" class="">Log In</a></li>
+      </ul>
+
+      <ul class='base-nav-bot nav nav-pills nav-stacked'>
+         <li><a href="/logout" class="">Log Out</a></li>
+      </ul>
+
+   </div>
+
+   <div class="base-content">
+      <div id="content">
+         {% block body %}
+         {% endblock %}
+      </div>
+   </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/blog.js"></script>
 
 </body>
 </html>

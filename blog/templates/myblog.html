@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
-
-   <h2>All blogs</h2>
+   <h2>My blogs</h2>
    {% for p in posts %}
       {{p.render() | safe}}
       <br><br>
