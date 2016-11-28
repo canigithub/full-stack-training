@@ -99,8 +99,9 @@ class User(db.Model):
       return the User object
       """
       u = cls.by_name(name)
-
       if u and valid_pw(name, passwd, u.pw_hash):
          return u
+
+
 
 

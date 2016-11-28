@@ -106,9 +106,9 @@ class LoginPageHandler(base.BaseHandler):
             self.login(u)  # set cookie for current user
             self.redirect('/welcome')
 
-      else:
-         self.render('login-form.html',
-                     error_msg='Invalid username or password')
+         else:
+            self.render('login-form.html',
+               error_msg='Invalid username or password')
 
 
 

@@ -1,0 +1,216 @@
+body {
+   font-family: Helvetica, Arial, sans-serif;
+   font-size: 14px;
+   width: 800px;
+   margin: 0 auto;
+   padding: 10px;
+   color: #333;
+   background-color: white;
+}
+
+.error {
+   color: red;
+}
+
+h2 {
+   font-size: 24px;
+   font-weight: bold;
+   margin-bottom: 20px;
+}
+
+
+
+label {
+   display: block;
+   font-size: 20px;
+}
+
+label + label {
+   margin-top: 20px;
+}
+
+input[type=text],
+input[type=password] {
+   width: 260px;
+   font-size: 20px;
+   padding: 2px;
+   font-family: monospace;
+}
+
+textarea {
+   width: 500px;
+   height: 400px;
+   font-size: 17px;
+   font-family: monospace;
+}
+
+input[type=submit] {
+   font-size: 24px;
+}
+
+.main-title {
+   display: block;
+   color: #222;
+   font-size: 40px;
+   font-weight: bold;
+   text-align: center;
+   margin-bottom: 30px;
+   text-decoration: none;
+}
+
+
+
+/***********  Mainpage section  ***********/
+
+.mainpage-content {
+   border: 1px solid gray;
+   border-radius: 5px;
+   width: 800px;
+   height: 600px;
+   margin: 0 auto;
+}
+
+.mainpage-content > .container {
+   width: 800px;
+}
+
+.manipage-btn {
+   width: 200px;
+   height: 60px;
+}
+
+.mainpage-title {
+   margin-top: 50px;
+   margin-bottom: 120px;
+}
+
+.mainpage-btn-group + .mainpage-btn-group {
+   margin-top: 20px;
+}
+
+
+/***********  Signup section  ***********/
+
+.signup-content {
+   border: 1px solid gray;
+   border-radius: 5px;
+   width: 800px;
+   height: 500px;
+   margin: 0 auto;
+}
+
+.signup-content > .container {
+   width: 800px;
+}
+
+.signup-content input[type=text],
+.signup-content input[type=password] {
+   width: 330px;
+   font-size: 20px;
+   padding: 2px;
+   font-family: monospace;
+}
+
+.signup-input {
+   padding-top: 12px;
+}
+
+.signup-error {
+   padding-top: 20px;
+}
+
+.signup-submit {
+   margin-top: 40px;
+}
+
+
+/***********  Login section  ***********/
+
+.login-content {
+   border: 1px solid gray;
+   border-radius: 5px;
+   width: 800px;
+   height: 400px;
+   margin: 0 auto;
+}
+
+.login-content > .container {
+   width: 800px;
+}
+
+.login-content input[type=text],
+.login-content input[type=password] {
+   width: 400px;
+   font-size: 20px;
+   padding: 2px;
+   font-family: monospace;
+}
+
+.login-input {
+   padding-top: 12px;
+}
+
+.login-submit {
+   margin-top: 40px;
+   margin-bottom: 20px;
+}
+
+
+/***********  Post section  ***********/
+
+.post {
+   border: 1px solid gray;
+   border-radius: 5px;
+   padding: 10px;
+}
+
+
+.post-heading {
+   position: relative;
+   border-bottom: 3px solid #666;
+}
+
+.post-title {
+   font-size: 24px;
+   font-weight: bold;
+}
+
+.post-author {
+   font-size: 15px;
+}
+
+.post-date {
+   position: absolute;
+   right: 0;
+   bottom: 0;
+   color: #999;
+}
+
+.post-footer {
+   margin-top: 5px;
+   position: relative;
+}
+
+
+.post-edit {
+   display: inline;
+}
+
+.post-like {
+   display: inline;
+   position: absolute;
+   right: 0;
+   bottom: 0;
+}
+
+.post-content {
+   margin-top: 5px;
+}
+
+
+
+
+
+
+
+

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block body %}
-   <h2>{{username}}, YOU CAN <br>
-   1. EDIT/DELETE YOUR POST ONLY!!! <br>
-   2. LIKE/DISLIKE OTHER'S POST ONLY!!! <br>
-   3. COMMENT ON OTHER'S POST ONLY!!! <br>
-   4. LIKE/DISLIKE ONCE PER POST!!! <br>
-   5. {{code}} </h2>
+   <h2>{{username}}, YOU CAN NOT<br>
+   1. EDIT/DELETE OHTER'S POST!!! <br>
+   2. LIKE/DISLIKE YOUR POST!!! <br>
+   3. COMMENT ON YOUR POST!!! <br>
+   4. LIKE/DISLIKE MORE THAN ONCE PER POST!!! <br>
+   You action violates: {{code}} </h2>
 
 {% endblock %}
