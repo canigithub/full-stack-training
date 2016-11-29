@@ -7,7 +7,7 @@ from google.appengine.ext import db
 def like_key(name='default'):
    """
    ensure hierarchy for future use.
-   default parent key: Key(blogs, 'default')
+   default parent key: Key(likes, 'default')
    """
    return db.Key.from_path('likes', name)
 

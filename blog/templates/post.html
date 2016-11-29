@@ -15,15 +15,19 @@
 
 
    <div class="post-content">
-      {{p.html_content | safe}}
+      <p>{{p.html_content | safe}}<p>
    </div>
 
    <div class="post-footer">
+
       <div class="post-edit">
          <a href="/blog/edit/{{p.key().id()}}">edit</a>
          |
          <a href="/blog/delete/{{p.key().id()}}">delete</a>
       </div>
+
+      <a class="link-comment" href="/blog/newcomment/{{p.key().id()}}/{{p.user_id}}">add comment</a>
+
       <div class="post-like">
          <a href="/blog/like/{{p.key().id()}}/{{p.user_id}}">like</a>
          ({{likes}}) |
@@ -31,4 +35,19 @@
          ({{dislikes}})
       </div>
    </div>
+
+   <hr>
+
+   <div class="after-footer text-center">
+      <button id="btn-{{p.key().id()}}" onclick="showPostComments({{p.key().id()}})" class="btn-show-comment">show comments</button>
+   </div>
+
+   <div id="comment-{{p.key().id()}}" class="post-comments">
+      <h4>Comments</h4>
+      {% for c in comments %}
+         {{ c.render() | safe }}
+      {% endfor %}
+      </div>
+
+
 </div>

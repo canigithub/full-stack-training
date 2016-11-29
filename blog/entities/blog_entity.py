@@ -3,6 +3,7 @@ from google.appengine.ext import db
 
 import env
 import like_entity as like
+import comment_entity as comment
 
 
 ##### Global Functions
@@ -34,6 +35,7 @@ class Post(db.Model):
       created - post created time
       last_modified - last modify time
       user_id - the id of owner of this post
+      username - username of the ower
    """
    subject = db.StringProperty(required=True)
    content = db.TextProperty(required=True)
@@ -49,19 +51,27 @@ class Post(db.Model):
       return the html text of the post
       """
       self.html_content = self.content.replace('/n', '<br>')
+      # fetch likes/dislikes
       likes = like.Like.get_likes(str(self.key().id()))
       dislikes = like.Like.get_likes(str(self.key().id()), False)
+
+      # fetch comments
+      comments = comment.Comment.by_post_id(str(self.key().id()))
       return render_str('post.html', p=self, likes=likes,
-         dislikes=dislikes)
+         dislikes=dislikes, comments=comments)
 
    @classmethod
    def by_id(cls, post_id):
+      """
+      get post via post_id
+      """
       return cls.get_by_id(post_id, parent=blog_key())
 
    @classmethod
    def by_user_id(cls, user_id):
-      # print("^^^&&&***", cls.all().filter('user_id =', user_id).count())
-      # print("^^^&&&***", cls.all().filter('user_id =', user_id).get())
+      """
+      get posts via user_id
+      """
       return cls.all().filter('user_id =', user_id).fetch(limit=20)
 
 

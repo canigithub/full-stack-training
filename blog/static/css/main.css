@@ -9,6 +9,17 @@ body {
    background-image: url(http://1.bp.blogspot.com/-aLz66ej-zdQ/UVmu0WOQaiI/AAAAAAAAFIM/hLG0Y9cf43c/s1600/wet-graph-paper-seamless-background.jpg);
 }
 
+h2 {
+   font-size: 24px;
+   font-weight: bold;
+   margin-bottom: 20px;
+}
+
+h4 {
+   font-size: 16px;
+   font-weight: bold;
+}
+
 .error {
    color: red;
 }
@@ -66,11 +77,6 @@ body {
 }
 
 
-h2 {
-   font-size: 24px;
-   font-weight: bold;
-   margin-bottom: 20px;
-}
 
 
 label {
@@ -219,8 +225,12 @@ input[type=submit] {
 .post-footer {
    margin-top: 5px;
    position: relative;
+   margin-bottom: -15px;
 }
 
+.after-footer {
+   margin-top: -5px;
+}
 
 .post-edit {
    display: inline;
@@ -259,6 +269,27 @@ input[type=submit] {
    margin-top: 100px;
 }
 
+.post-comments {
+   display: none;
+}
 
+.comment p {
+   margin: 0;
+   padding: 0;
+}
+
+.comment + .comment {
+   border-top: 1px solid #bbb;
+}
+
+.comment-textarea {
+   margin-top: 20px;
+   width: 760px;
+   height: 100px;
+}
+
+.link-comment {
+   margin-left: 250px;
+}
 
 

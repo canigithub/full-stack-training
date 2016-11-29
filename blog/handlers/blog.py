@@ -3,6 +3,8 @@ from google.appengine.ext import db
 import base
 from entities import blog_entity as blog
 from entities import like_entity as like
+from entities import comment_entity as comment
+import time
 
 ##### Blog Handlers
 
@@ -13,7 +15,7 @@ class BlogFrontPageHandler(base.BaseHandler):
    """
    def get(self):
       # posts = db.GqlQuery('select * from Post order by created desc limit 10')
-      posts = blog.Post.all().fetch(limit=20)
+      posts = blog.Post.all().order('-created').fetch(limit=20)
       self.render('blog-front.html', posts=posts)
 
 
@@ -82,7 +84,6 @@ class EditPostPageHandler(base.BaseHandler):
    display the to be edited post
    """
    def get(self, post_id):
-      print("^^^>>>", self.user)
       if not self.user:
          self.redirect('/login')
          return
@@ -135,6 +136,7 @@ class DeletePostHandler(base.BaseHandler):
          self.redirect('/invalid/1')
       else:
          post.delete()
+         time.sleep(0.1)
          self.redirect('/blog')
 
 
@@ -157,6 +159,7 @@ class PostLikeHandler(base.BaseHandler):
       else:
          lk = True if up == 'like' else False
          like.Like.add_like(post_id, str(self.user.key().id()), lk)
+         time.sleep(0.1)
          self.redirect('/blog')
 
 
@@ -176,6 +179,36 @@ class MyBlogPageHandler(base.BaseHandler):
 
 
 
+class NewCommentPageHandler(base.BaseHandler):
+   """
+   handles '/blog/newcomment/(\d+)', number is post_id
+   display page to add new comment
+   """
+   def get(self, post_id, user_id):
+      if not self.user:
+         self.redirect('/login')
+         return
+
+      if user_id == str(self.user.key().id()):
+         self.redirect('/invalid/3')
+      else:
+         post = blog.Post.by_id(int(post_id))
+         self.render('newcomment.html', p=post)
+
+
+   def post(self, post_id, user_id):
+      """
+      user_id - user_id of the owner of the post
+      """
+      content = self.request.get('content')
+
+      if not content:
+         post = blog.Post.by_id(int(post_id))
+         self.render('newcomment.html', p=post, error_msg='Please enter comment')
+      else:
+         comment.Comment.add_comment(post_id, str(self.user.key().id()), content, self.user.name)
+         time.sleep(0.1)
+         self.redirect('/blog')
 
 
 
