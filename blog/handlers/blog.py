@@ -16,7 +16,10 @@ class BlogFrontPageHandler(base.BaseHandler):
    def get(self):
       # posts = db.GqlQuery('select * from Post order by created desc limit 10')
       posts = blog.Post.all().order('-created').fetch(limit=20)
-      self.render('blog-front.html', posts=posts)
+      if not self.user:
+         self.render('/logged-out/blog-front-out.html', posts=posts)
+      else:
+         self.render('/logged-in/blog-front-in.html', posts=posts)
 
 
 class AddNewPostPageHandler(base.BaseHandler):
@@ -31,7 +34,7 @@ class AddNewPostPageHandler(base.BaseHandler):
       otherwise, redirect to login page
       """
       if self.user:
-         self.render('newpost.html')
+         self.render('/logged-in/newpost.html')
       else:
          self.redirect('/login')
 
@@ -55,7 +58,7 @@ class AddNewPostPageHandler(base.BaseHandler):
          p.put()
          self.redirect('/blog/%s' % str(p.key().id()))
       else:
-         self.render('newpost.html',
+         self.render('/logged-in/newpost.html',
                      subject=subject,
                      content=content,
                      error_msg='Enter both subject and content, please!')
@@ -74,7 +77,7 @@ class PermalinkPageHandler(base.BaseHandler):
       if not post:
          self.error(404)
       else:
-         self.render('permalink.html', p=post)
+         self.render('/logged-in/permalink.html', p=post)
 
 
 
@@ -95,7 +98,7 @@ class EditPostPageHandler(base.BaseHandler):
       elif post.user_id != str(self.user.key().id()):
          self.redirect('/invalid/1')
       else:
-         self.render('edit-post.html', p=post)
+         self.render('/logged-in/edit-post.html', p=post)
 
 
    def post(self, post_id):
@@ -110,7 +113,7 @@ class EditPostPageHandler(base.BaseHandler):
          p.put()
          self.redirect('/blog/%s' % str(p.key().id()))
       else:
-         self.render('newpost.html',
+         self.render('/logged-in/newpost.html',
                      subject=subject,
                      content=content,
                      error_msg='Enter both subject and content, please!')
@@ -175,7 +178,7 @@ class MyBlogPageHandler(base.BaseHandler):
          return
 
       posts = blog.Post.by_user_id(str(self.user.key().id()))
-      self.render('myblog.html', posts=posts)
+      self.render('/logged-in/myblog.html', posts=posts)
 
 
 
@@ -193,7 +196,7 @@ class NewCommentPageHandler(base.BaseHandler):
          self.redirect('/invalid/3')
       else:
          post = blog.Post.by_id(int(post_id))
-         self.render('newcomment.html', p=post)
+         self.render('/logged-in/newcomment.html', p=post)
 
 
    def post(self, post_id, user_id):
@@ -204,13 +207,33 @@ class NewCommentPageHandler(base.BaseHandler):
 
       if not content:
          post = blog.Post.by_id(int(post_id))
-         self.render('newcomment.html', p=post, error_msg='Please enter comment')
+         self.render('/logged-in/newcomment.html', p=post, error_msg='Please enter comment')
       else:
          comment.Comment.add_comment(post_id, str(self.user.key().id()), content, self.user.name)
          time.sleep(0.1)
          self.redirect('/blog')
 
 
+
+class DeleteCommentHandler(base.BaseHandler):
+   """
+   handles /blog/comment/delete/(\d+)
+   delete the comment of comment_id
+   """
+   def get(self, comment_id):
+      if not self.user:
+         self.redirect('/login')
+         return
+
+      c = comment.Comment.by_id(comment_id)
+      if not c:
+         self.error(404)
+      elif c.user_id != str(self.user.key().id()):
+         self.redirect('/invalid/5')
+      else:
+         c.delete()
+         time.sleep(0.1)
+         self.redirect('/blog')
 
 
 

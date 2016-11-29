@@ -5,7 +5,7 @@
          {{p.subject}}
       </div>
       <div class="post-author">
-         author: {{p.username | safe}}
+         author: {{p.username}}
       </div>
       <div class="post-date">
          {{p.created.strftime("%b %d, %Y")}}
@@ -15,7 +15,7 @@
 
 
    <div class="post-content">
-      <p>{{p.html_content | safe}}<p>
+      {{p.html_content | safe}}
    </div>
 
    <div class="post-footer">

@@ -45,6 +45,14 @@ class Comment(db.Model):
    def render(self):
       return render_str('comment.html', c=self)
 
+   @classmethod
+   def by_id(cls, comment_id):
+      """
+      get comments by comment_id
+      """
+      print('^^^***', comment_id)
+      return cls.get_by_id(int(comment_id), parent=comment_key())
+
 
    @classmethod
    def by_post_id(cls, post_id):

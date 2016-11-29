@@ -273,6 +273,11 @@ input[type=submit] {
    display: none;
 }
 
+.comment {
+   position: relative;
+   display: flex;
+}
+
 .comment p {
    margin: 0;
    padding: 0;
@@ -286,6 +291,12 @@ input[type=submit] {
    margin-top: 20px;
    width: 760px;
    height: 100px;
+}
+
+.comment-delte {
+   position: absolute;
+   right: 0;
+   bottom: 0;
 }
 
 .link-comment {

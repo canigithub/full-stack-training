@@ -6,4 +6,7 @@ class MainPageHandler(base.BaseHandler):
    display main page.
    """
    def get(self):
-      self.render("mainpage.html")
+      if not self.user:
+         self.render("/logged-out/mainpage-out.html")
+      else:
+         self.render("/logged-in/mainpage-in.html", username=self.user.name)

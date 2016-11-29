@@ -1,0 +1,11 @@
+{% extends "/logged-in/base-in.html" %}
+
+{% block body %}
+
+   <h2>All blogs</h2>
+   {% for p in posts %}
+      {{p.render() | safe}}
+      <br><br>
+   {% endfor %}
+
+{% endblock %}

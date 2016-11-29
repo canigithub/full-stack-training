@@ -1,4 +1,5 @@
 import re
+import time
 
 from google.appengine.ext import db
 
@@ -41,7 +42,11 @@ class SignupPageHandler(base.BaseHandler):
    redirect to welcome page
    """
    def get(self):
-      self.render('signup-form.html')
+      if self.user:
+         self.logout()
+         self.redirect('/')
+      else:
+         self.render('/logged-out/signup-form.html')
 
 
    def post(self):
@@ -69,18 +74,18 @@ class SignupPageHandler(base.BaseHandler):
          is_error = True
 
       if is_error:
-         self.render('signup-form.html', **params)
+         self.render('/logged-out/signup-form.html', **params)
       else:
          u = user.User.by_name(username)
 
          if u:
-            self.render('signup-form.html',
+            self.render('/logged-out/signup-form.html',
                         error_username='Username already exists')
          else:
             u = user.User.create(username, password, email)
             u.put()        # store user in database
             self.login(u)  # set cookie for current user
-            self.redirect('/welcome')
+            self.redirect('/')
 
 
 
@@ -91,7 +96,12 @@ class LoginPageHandler(base.BaseHandler):
    redirect to welcome page
    """
    def get(self):
-      self.render('login-form.html')
+      if not self.user:
+         self.render('/logged-out/login-form.html')
+      else:
+         self.logout()
+         time.sleep(0.1)
+         self.redirect('/login')
 
 
    def post(self):
@@ -104,10 +114,10 @@ class LoginPageHandler(base.BaseHandler):
 
          if u:
             self.login(u)  # set cookie for current user
-            self.redirect('/welcome')
+            self.redirect('/')
 
          else:
-            self.render('login-form.html',
+            self.render('/logged-out/login-form.html',
                error_msg='Invalid username or password')
 
 
@@ -119,7 +129,10 @@ class LogoutHandler(base.BaseHandler):
    redirect to signup page
    """
    def get(self):
-      self.logout()
+      if self.user:
+         self.logout()
+
+      time.sleep(0.1)
       self.redirect('/login')
 
 

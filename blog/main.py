@@ -28,10 +28,10 @@ app = webapp2.WSGIApplication([
    ('/blog/(like|dislike)/(\d+)/(\d+)', blog.PostLikeHandler),
    ('/blog/myblog', blog.MyBlogPageHandler),
    ('/blog/newcomment/(\d+)/(\d+)', blog.NewCommentPageHandler),
+   ('/blog/comment/delete/(\d+)', blog.DeleteCommentHandler),
    ('/signup', user.SignupPageHandler),
    ('/login', user.LoginPageHandler),
    ('/logout', user.LogoutHandler),
-   ('/welcome', other.WelcomePageHandler),
    ('/invalid/(\d+)', other.InvalidPageHandler)
    ], debug=True)
 

@@ -50,13 +50,17 @@ class Post(db.Model):
       take current user_id of the
       return the html text of the post
       """
-      self.html_content = self.content.replace('/n', '<br>')
+
+      # self.html_content = self.content.replace(r'/n', '<br>')
+      self.html_content = '<br>'.join(self.content.split('\n'))
+
       # fetch likes/dislikes
       likes = like.Like.get_likes(str(self.key().id()))
       dislikes = like.Like.get_likes(str(self.key().id()), False)
 
       # fetch comments
       comments = comment.Comment.by_post_id(str(self.key().id()))
+
       return render_str('post.html', p=self, likes=likes,
          dislikes=dislikes, comments=comments)
 
