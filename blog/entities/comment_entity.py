@@ -50,7 +50,6 @@ class Comment(db.Model):
       """
       get comments by comment_id
       """
-      print('^^^***', comment_id)
       return cls.get_by_id(int(comment_id), parent=comment_key())
 
 

@@ -69,7 +69,7 @@ class User(db.Model):
       """
       get object using id
       """
-      return cls.get_by_id(uid, parent=user_key())
+      return cls.get_by_id(int(uid), parent=user_key())
 
 
    @classmethod

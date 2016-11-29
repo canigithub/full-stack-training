@@ -28,6 +28,14 @@ class Like(db.Model):
 
 
    @classmethod
+   def by_post_id_user_id(cls, post_id, user_id):
+      """
+      return Like instance
+      """
+      return cls.all.filter('post_id =', post_id).filter('user_id =', user_id).get()
+
+
+   @classmethod
    def get_likes(cls, post_id, like=True):
       """
       get the number of likes/dislikes of a post

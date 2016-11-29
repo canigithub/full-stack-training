@@ -71,6 +71,7 @@ class Post(db.Model):
       """
       return cls.get_by_id(int(post_id), parent=blog_key())
 
+
    @classmethod
    def by_user_id(cls, user_id):
       """
@@ -79,6 +80,13 @@ class Post(db.Model):
       return cls.all().filter('user_id =', user_id).fetch(limit=20)
 
 
+   @classmethod
+   def check_if_exist(cls, post_id):
+      """
+      check if a post is exist. if exist, return true
+      """
+      p = cls.by_id(post_id)
+      return p != None
 
 
 

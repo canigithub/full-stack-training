@@ -6,6 +6,60 @@ from entities import like_entity as like
 from entities import comment_entity as comment
 import time
 
+
+##### Decorators
+
+def check_if_valid_user(func):
+   def inner(*a, **kw):
+      self = a[0]
+      if not self.user:
+         self.redirect('/login')
+      else:
+         return func(*a, **kw)
+   return inner
+
+
+def check_if_valid_post(func):
+   def inner(*a, **kw):
+      self = a[0]  # a[0] is self, a[1] is post_id
+      post_id = a[1]
+      p = blog.Post.by_id(post_id)
+      if not p:
+         self.error(404)
+      else:
+         kw['post'] = p
+         return func(*a, **kw)
+   return inner
+
+
+def check_if_valid_comment(func):
+   def inner(*a, **kw):
+      self = a[0]  # a[0]:self, a[1]:comment_id
+      comment_id = a[1]
+      c = comment.Comment.by_id(comment_id)
+      if not c:
+         self.error(404)
+      else:
+         kw['comment'] = c
+         return func(*a, **kw)
+   return inner
+
+
+def check_if_valid_post_user(func):
+   def inner(*a, **kw):
+      self = a[0]  # a[0]: self, a[1]: post_id, a[2]: user_id
+      post_id = a[1]
+      user_id = a[2]
+      p = blog.Post.by_id(post_id)
+      u = user.User.by_id(user_id)
+      if not (p and u):
+         self.error(404)
+      else:
+         return func(*a, **kw)
+   return inner
+
+
+
 ##### Blog Handlers
 
 class BlogFrontPageHandler(base.BaseHandler):
@@ -13,6 +67,7 @@ class BlogFrontPageHandler(base.BaseHandler):
    handles '/blog'
    display the main page of blog section.
    """
+
    def get(self):
       # posts = db.GqlQuery('select * from Post order by created desc limit 10')
       posts = blog.Post.all().order('-created').fetch(limit=20)
@@ -28,24 +83,21 @@ class AddNewPostPageHandler(base.BaseHandler):
    display the page to create new post.
    redirect to permalink page
    """
+
+   @check_if_valid_user
    def get(self):
       """
       if is (signed in) user, render new post page;
       otherwise, redirect to login page
       """
-      if self.user:
-         self.render('/logged-in/newpost.html')
-      else:
-         self.redirect('/login')
+      self.render('/logged-in/newpost.html')
 
 
+   @check_if_valid_user
    def post(self):
       """
       if not user, redirect to blog front page
       """
-      if not self.user:
-         self.redirect('/blog')
-
       subject = self.request.get('subject')
       content = self.request.get('content')
 
@@ -70,14 +122,11 @@ class PermalinkPageHandler(base.BaseHandler):
    handles '/blog/(\d+)' where the number is the post id
    display the newly created post.
    """
-   def get(self, post_id):
-      key = db.Key.from_path('Post', int(post_id), parent=blog.blog_key())
-      post = db.get(key)
 
-      if not post:
-         self.error(404)
-      else:
-         self.render('/logged-in/permalink.html', p=post)
+   @check_if_valid_user
+   @check_if_valid_post
+   def get(self, post_id, **kw):
+      self.render('/logged-in/permalink.html', p=kw['post'])
 
 
 
@@ -86,28 +135,25 @@ class EditPostPageHandler(base.BaseHandler):
    handles '/blog/edit/(\d+)' where the number is the post id
    display the to be edited post
    """
-   def get(self, post_id):
-      if not self.user:
-         self.redirect('/login')
-         return
 
-      post = blog.Post.by_id(post_id)
+   @check_if_valid_user
+   @check_if_valid_post
+   def get(self, post_id, **kw):
 
-      if not post:
-         self.error(404)
-      elif post.user_id != str(self.user.key().id()):
+      post = kw['post']
+      if post.user_id != str(self.user.key().id()):
          self.redirect('/invalid/1')
       else:
          self.render('/logged-in/edit-post.html', p=post)
 
-
-   def post(self, post_id):
+   @check_if_valid_user
+   @check_if_valid_post
+   def post(self, post_id, **kw):
       subject = self.request.get('subject')
       content = self.request.get('content')
 
       if subject and content:
-         key = db.Key.from_path('Post', int(post_id), parent=blog.blog_key())
-         p = db.get(key)
+         p = kw['post']
          p.subject = subject
          p.content = content
          p.put()
@@ -125,17 +171,12 @@ class DeletePostHandler(base.BaseHandler):
    handles '/blog/delete/(\d+)' where the number is the post id
    delete the post of post_id
    """
+
+   @check_if_valid_user
+   @check_if_valid_post
    def get(self, post_id):
-      if not self.user:
-         self.redirect('/login')
-         return
-
-      key = db.Key.from_path('Post', int(post_id), parent=blog.blog_key())
-      post = db.get(key)
-
-      if not post:
-         self.error(404)
-      elif post.user_id != str(self.user.key().id()):
+      post = kw['post']
+      if post.user_id != str(self.user.key().id()):
          self.redirect('/invalid/1')
       else:
          post.delete()
@@ -149,10 +190,10 @@ class PostLikeHandler(base.BaseHandler):
    handles '/blog/(like|dislike)/(\d+)/(\d+)' where the number is post_id
    and user_id of that post.
    """
+
+   @check_if_valid_user
+   @check_if_valid_post_user
    def get(self, up, post_id, user_id):
-      if not self.user:
-         self.redirect('/login')
-         return
 
       if user_id == str(self.user.key().id()):
          self.redirect('/invalid/2')
@@ -172,10 +213,9 @@ class MyBlogPageHandler(base.BaseHandler):
    handles '/blog/myblot'
    display all posts that is posted by me
    """
+
+   @check_if_valid_user
    def get(self):
-      if not self.user:
-         self.redirect('/login')
-         return
 
       posts = blog.Post.by_user_id(str(self.user.key().id()))
       self.render('/logged-in/myblog.html', posts=posts)
@@ -184,13 +224,13 @@ class MyBlogPageHandler(base.BaseHandler):
 
 class NewCommentPageHandler(base.BaseHandler):
    """
-   handles '/blog/newcomment/(\d+)', number is post_id
+   handles '/blog/newcomment/(\d+)/(\d+)', number is post_id
    display page to add new comment
    """
+
+   @check_if_valid_user
+   @check_if_valid_post_user
    def get(self, post_id, user_id):
-      if not self.user:
-         self.redirect('/login')
-         return
 
       if user_id == str(self.user.key().id()):
          self.redirect('/invalid/3')
@@ -198,7 +238,8 @@ class NewCommentPageHandler(base.BaseHandler):
          post = blog.Post.by_id(post_id)
          self.render('/logged-in/newcomment.html', p=post)
 
-
+   @check_if_valid_user
+   @check_if_valid_post_user
    def post(self, post_id, user_id):
       """
       user_id - user_id of the owner of the post
@@ -220,15 +261,13 @@ class DeleteCommentHandler(base.BaseHandler):
    handles /blog/comment/delete/(\d+)
    delete the comment of comment_id
    """
-   def get(self, comment_id):
-      if not self.user:
-         self.redirect('/login')
-         return
 
-      c = comment.Comment.by_id(comment_id)
-      if not c:
-         self.error(404)
-      elif c.user_id != str(self.user.key().id()):
+   @check_if_valid_user
+   @check_if_valid_comment
+   def get(self, comment_id, **kw):
+
+      c = kw['comment']
+      if c.user_id != str(self.user.key().id()):
          self.redirect('/invalid/5')
       else:
          c.delete()
@@ -242,28 +281,30 @@ class EditCommentPageHandler(base.BaseHandler):
    handles /blog/comment/edit/(\d+)
    edit the comment of comment_id
    """
-   def get(self, comment_id):
-      if not self.user:
-         self.redirect('/login')
-         return
 
-      c = comment.Comment.by_id(comment_id)
+   @check_if_valid_user
+   @check_if_valid_comment
+   def get(self, comment_id, **kw):
+
+      c = kw['comment']
       p = blog.Post.by_id(c.post_id)
-      if not c:
-         self.error(404)
-      elif c.user_id != str(self.user.key().id()):
+      if c.user_id != str(self.user.key().id()):
          self.redirect('/invalid/5')
       else:
          self.render('/logged-in/edit-comment.html',
             p=p, content=c.content)
 
-   def post(self, comment_id):
+
+   @check_if_valid_user
+   @check_if_valid_comment
+   def post(self, comment_id, **kw):
+
       content = self.request.get('content')
       if not content:
          post = blog.Post.by_id(post_id)
          self.render('/logged-in/newcomment.html', p=post, error_msg='Please enter comment')
       else:
-         c = comment.Comment.by_id(comment_id)
+         c = kw['comment']
          c.content = content
          c.put()
          time.sleep(0.1)

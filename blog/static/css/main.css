@@ -97,7 +97,7 @@ input[type=password] {
 }
 
 textarea {
-   width: 500px;
+   width: 760px;
    height: 400px;
    font-size: 17px;
    font-family: monospace;
@@ -251,13 +251,13 @@ input[type=submit] {
 /*Newpost section editpost section*/
 
 .newpost, .editpost {
-   margin-left: 120px;
+   /*margin-left: 120px;*/
    margin-top: 30px;
 }
 
 .newpost input[type=text],
 .editpost input[type=text] {
-   width: 500px;
+   width: 760px;
    font-size: 20px;
    padding: 2px;
    font-family: monospace;
@@ -307,6 +307,15 @@ input[type=submit] {
 
 .link-comment {
    margin-left: 250px;
+}
+
+/*.submit-cancel {
+   display: flex;
+}*/
+
+.btn-cancel {
+   font-size: 20px;
+   margin-left: 600px;
 }
 
 
