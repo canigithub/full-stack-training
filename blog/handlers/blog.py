@@ -1,6 +1,7 @@
 from google.appengine.ext import db
 
 import base
+from entities import user_entity as user
 from entities import blog_entity as blog
 from entities import like_entity as like
 from entities import comment_entity as comment
@@ -45,11 +46,32 @@ def check_if_valid_comment(func):
    return inner
 
 
-def check_if_valid_post_user(func):
+def check_if_valid_post_user_comment(func):
+   """
+   check if the post_id and user_id for new comment is valid
+   """
    def inner(*a, **kw):
       self = a[0]  # a[0]: self, a[1]: post_id, a[2]: user_id
       post_id = a[1]
       user_id = a[2]
+      p = blog.Post.by_id(post_id)
+      u = user.User.by_id(user_id)
+      if not (p and u):
+         self.error(404)
+      else:
+         return func(*a, **kw)
+   return inner
+
+
+
+def check_if_valid_post_user_like(func):
+   """
+   check if the post_id and user_id for like/dislike is valid
+   """
+   def inner(*a, **kw):
+      self = a[0]  # a[0]: self, a[2]: post_id, a[3]: user_id
+      post_id = a[2]
+      user_id = a[3]
       p = blog.Post.by_id(post_id)
       u = user.User.by_id(user_id)
       if not (p and u):
@@ -105,8 +127,7 @@ class AddNewPostPageHandler(base.BaseHandler):
          p = blog.Post(parent=blog.blog_key(),
                   subject=subject,
                   content=content,
-                  user_id=str(self.user.key().id()),
-                  username=self.user.name)
+                  user_id=str(self.user.key().id()))
          p.put()
          self.redirect('/blog/%s' % str(p.key().id()))
       else:
@@ -146,9 +167,15 @@ class EditPostPageHandler(base.BaseHandler):
       else:
          self.render('/logged-in/edit-post.html', p=post)
 
+
    @check_if_valid_user
    @check_if_valid_post
    def post(self, post_id, **kw):
+
+      post = kw['post']
+      if post.user_id != str(self.user.key().id()):
+         self.redirect('/invalid/1')
+
       subject = self.request.get('subject')
       content = self.request.get('content')
 
@@ -192,7 +219,7 @@ class PostLikeHandler(base.BaseHandler):
    """
 
    @check_if_valid_user
-   @check_if_valid_post_user
+   @check_if_valid_post_user_like
    def get(self, up, post_id, user_id):
 
       if user_id == str(self.user.key().id()):
@@ -229,7 +256,7 @@ class NewCommentPageHandler(base.BaseHandler):
    """
 
    @check_if_valid_user
-   @check_if_valid_post_user
+   @check_if_valid_post_user_comment
    def get(self, post_id, user_id):
 
       if user_id == str(self.user.key().id()):
@@ -238,19 +265,24 @@ class NewCommentPageHandler(base.BaseHandler):
          post = blog.Post.by_id(post_id)
          self.render('/logged-in/newcomment.html', p=post)
 
+
    @check_if_valid_user
-   @check_if_valid_post_user
+   @check_if_valid_post_user_comment
    def post(self, post_id, user_id):
       """
       user_id - user_id of the owner of the post
       """
+
+      if user_id == str(self.user.key().id()):
+         self.redirect('/invalid/3')
+
       content = self.request.get('content')
 
       if not content:
          post = blog.Post.by_id(post_id)
          self.render('/logged-in/newcomment.html', p=post, error_msg='Please enter comment')
       else:
-         comment.Comment.add_comment(post_id, str(self.user.key().id()), content, self.user.name)
+         comment.Comment.add_comment(post_id, str(self.user.key().id()), content)
          time.sleep(0.1)
          self.redirect('/blog')
 
@@ -298,6 +330,11 @@ class EditCommentPageHandler(base.BaseHandler):
    @check_if_valid_user
    @check_if_valid_comment
    def post(self, comment_id, **kw):
+
+      c = kw['comment']
+      if c.user_id != str(self.user.key().id()):
+         self.redirect('/invalid/5')
+         return
 
       content = self.request.get('content')
       if not content:

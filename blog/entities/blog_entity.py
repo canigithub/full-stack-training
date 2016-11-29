@@ -3,6 +3,7 @@ from google.appengine.ext import db
 
 import env
 import like_entity as like
+import user_entity as user
 import comment_entity as comment
 
 
@@ -42,7 +43,7 @@ class Post(db.Model):
    created = db.DateTimeProperty(auto_now_add=True)
    last_modified = db.DateTimeProperty(auto_now=True)
    user_id = db.StringProperty(required=True)
-   username = db.StringProperty(required=True)
+   # username = db.StringProperty(required=True)
 
 
    def render(self):
@@ -54,6 +55,9 @@ class Post(db.Model):
       # self.html_content = self.content.replace(r'/n', '<br>')
       self.html_content = '<br>'.join(self.content.split('\n'))
 
+      # get user name
+      username = user.User.by_id(self.user_id).name
+
       # fetch likes/dislikes
       likes = like.Like.get_likes(str(self.key().id()))
       dislikes = like.Like.get_likes(str(self.key().id()), False)
@@ -61,8 +65,8 @@ class Post(db.Model):
       # fetch comments
       comments = comment.Comment.by_post_id(str(self.key().id()))
 
-      return render_str('post.html', p=self, likes=likes,
-         dislikes=dislikes, comments=comments)
+      return render_str('post.html', p=self, username=username,
+         likes=likes, dislikes=dislikes, comments=comments)
 
    @classmethod
    def by_id(cls, post_id):

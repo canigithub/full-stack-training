@@ -2,7 +2,7 @@
 from google.appengine.ext import db
 
 import env
-
+import user_entity as user
 
 ##### Global Functions
 
@@ -39,11 +39,13 @@ class Comment(db.Model):
    content = db.TextProperty(required=True)
    created = db.DateTimeProperty(auto_now_add=True)
    last_modified = db.DateTimeProperty(auto_now=True)
-   username = db.StringProperty(required=True)
+   # username = db.StringProperty(required=True)
 
 
    def render(self):
-      return render_str('comment.html', c=self)
+      # get user name
+      username = user.User.by_id(self.user_id).name
+      return render_str('comment.html', username=username, c=self)
 
    @classmethod
    def by_id(cls, comment_id):
@@ -62,15 +64,14 @@ class Comment(db.Model):
 
 
    @classmethod
-   def add_comment(cls, post_id, user_id, content, username):
+   def add_comment(cls, post_id, user_id, content):
       """
       add a new comment from user_id to post_id
       """
       c = cls(parent=comment_key(),
                post_id=post_id,
                user_id=user_id,
-               content=content,
-               username=username)
+               content=content)
       c.put()
 
 
