@@ -293,9 +293,15 @@ input[type=submit] {
    height: 100px;
 }
 
-.comment-delte {
+.comment-delete {
    position: absolute;
    right: 0;
+   bottom: 0;
+}
+
+.comment-edit {
+   position: absolute;
+   right: 100px;
    bottom: 0;
 }
 

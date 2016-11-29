@@ -1,0 +1,17 @@
+{% extends "/logged-in/base-in.html" %}
+
+{% block body %}
+<div class="newcomment">
+   <h2>Edit Comment</h2>
+   {{p.render() | safe }}
+
+   <form method='post'>
+
+      <textarea class='comment-textarea' placeholder="Enter comment here" name='content'>{{content}}</textarea>
+
+      <div class="error">{{error_msg}}</div>
+
+      <input type="submit">
+   </form>
+</div>
+{% endblock %}

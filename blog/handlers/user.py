@@ -133,7 +133,7 @@ class LogoutHandler(base.BaseHandler):
          self.logout()
 
       time.sleep(0.1)
-      self.redirect('/login')
+      self.redirect('/')
 
 
 

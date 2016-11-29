@@ -1,5 +1,9 @@
 <div class="comment">
    <div>{{c.username}} ({{c.created.strftime("%D")}}): {{c.content}}</div>
-   <a href="/blog/comment/delete/{{c.key().id()}}" class="comment-delte">delete</a>
+   <div class="comment-delete">
+   <a href="/blog/comment/edit/{{c.key().id()}}">edit</a>
+   |
+   <a href="/blog/comment/delete/{{c.key().id()}}">delete</a>
+   </div>
 
 </div>

@@ -91,7 +91,7 @@ class EditPostPageHandler(base.BaseHandler):
          self.redirect('/login')
          return
 
-      post = blog.Post.by_id(int(post_id))
+      post = blog.Post.by_id(post_id)
 
       if not post:
          self.error(404)
@@ -195,7 +195,7 @@ class NewCommentPageHandler(base.BaseHandler):
       if user_id == str(self.user.key().id()):
          self.redirect('/invalid/3')
       else:
-         post = blog.Post.by_id(int(post_id))
+         post = blog.Post.by_id(post_id)
          self.render('/logged-in/newcomment.html', p=post)
 
 
@@ -206,7 +206,7 @@ class NewCommentPageHandler(base.BaseHandler):
       content = self.request.get('content')
 
       if not content:
-         post = blog.Post.by_id(int(post_id))
+         post = blog.Post.by_id(post_id)
          self.render('/logged-in/newcomment.html', p=post, error_msg='Please enter comment')
       else:
          comment.Comment.add_comment(post_id, str(self.user.key().id()), content, self.user.name)
@@ -236,6 +236,38 @@ class DeleteCommentHandler(base.BaseHandler):
          self.redirect('/blog')
 
 
+
+class EditCommentPageHandler(base.BaseHandler):
+   """
+   handles /blog/comment/edit/(\d+)
+   edit the comment of comment_id
+   """
+   def get(self, comment_id):
+      if not self.user:
+         self.redirect('/login')
+         return
+
+      c = comment.Comment.by_id(comment_id)
+      p = blog.Post.by_id(c.post_id)
+      if not c:
+         self.error(404)
+      elif c.user_id != str(self.user.key().id()):
+         self.redirect('/invalid/5')
+      else:
+         self.render('/logged-in/edit-comment.html',
+            p=p, content=c.content)
+
+   def post(self, comment_id):
+      content = self.request.get('content')
+      if not content:
+         post = blog.Post.by_id(post_id)
+         self.render('/logged-in/newcomment.html', p=post, error_msg='Please enter comment')
+      else:
+         c = comment.Comment.by_id(comment_id)
+         c.content = content
+         c.put()
+         time.sleep(0.1)
+         self.redirect('/blog')
 
 
 

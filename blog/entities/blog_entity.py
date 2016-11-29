@@ -69,7 +69,7 @@ class Post(db.Model):
       """
       get post via post_id
       """
-      return cls.get_by_id(post_id, parent=blog_key())
+      return cls.get_by_id(int(post_id), parent=blog_key())
 
    @classmethod
    def by_user_id(cls, user_id):

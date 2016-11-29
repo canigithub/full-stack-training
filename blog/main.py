@@ -29,6 +29,7 @@ app = webapp2.WSGIApplication([
    ('/blog/myblog', blog.MyBlogPageHandler),
    ('/blog/newcomment/(\d+)/(\d+)', blog.NewCommentPageHandler),
    ('/blog/comment/delete/(\d+)', blog.DeleteCommentHandler),
+   ('/blog/comment/edit/(\d+)', blog.EditCommentPageHandler),
    ('/signup', user.SignupPageHandler),
    ('/login', user.LoginPageHandler),
    ('/logout', user.LogoutHandler),
